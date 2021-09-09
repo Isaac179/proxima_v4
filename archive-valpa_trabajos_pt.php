@@ -3,15 +3,14 @@
 <div class="row cuerpo" >
    
 
-    <div class="row bolsa" >
-        <div class="columns grande-12 centered bolsa-color">
-           
-
-             <div class="columns grande-10 centered">
-                <h2>
-                    Bolsa de trabajo
-                </h2>
+<div class="row seccion-pagina">
+        <div class="cuadricula">
+            <div class="cuadro grande-1 medio-2 chico-12">
+                <span>Bolsa</span>
             </div>
+
+        <!-- <div class="cuadro medio-10 grande-11 chico-12 slider-home"> -->
+        
             <?php 
                     $sucursales = array(
                             'post_type'=> 'valpa_sucursales_pt',
@@ -25,10 +24,10 @@
                     if($sucursales_query->have_posts() ) : while ( $sucursales_query->have_posts() ) : $sucursales_query->the_post(); 
                     ?>   
 
-                        <div class="columns grande-8 centered sucursal-bolsa">
-                            <h2> 
+                        <div class="cuadro medio-10 grande-11 chico-12 slider-home">
+                            <!-- <h2> 
                                 <?php  echo $post->post_title; ?> <span><?php  echo $post->post_content; ?></span>
-                            </h2>
+                            </h2> -->
                              <?php 
                                 $id_sucursal = $post->ID;
                                  $puestos = array(
@@ -53,13 +52,17 @@
                                 ?>   
 
 
-                                    <a href="<?php echo get_permalink();?>?sucursal=<?php echo $id_sucursal;?>&puesto=<?php echo $post->ID;?>" class="boton-bolsa centered" > 
-                                
-                                       
-                                            <?php  echo $post->post_title; ?>
-                                         
-                                   
-                                    </a>
+                           <div class="cuadro medio-6 grande-12 chico-12 slider-home cuadro-trabajo" style="border-bottom: 20px solid 
+                           <?php echo get_post_meta( $empresa_relacionada, 'color_destacado_meta', true ); ?>;"> <!-- Color Estilo -->
+                           
+                           <!-- <?php  echo $post->post_title; ?><br><br> Imprime Puesto -->
+                           &nbsp;&nbsp;<?php echo get_the_title( $empresa_relacionada); ?><br><br> <!-- Imprime Empresa -->
+                           <p class="fa fa-map-marker"> <?php echo get_post_meta( $empresa_relacionada, 'datos_destacado_meta', true ); ?> </p><br><!-- Imprime Ubicacion-->         
+                           <a href="<?php echo get_permalink();?>?sucursal=<?php echo $id_sucursal;?>&puesto=<?php echo $post->ID;?>">Ver mas</a>
+                           
+                           <!-- echo "<a href='$link' title='$linktitle'>$linkname</a>"; -->
+                               
+                           </div>
 
 
                                 <?php endwhile; ?>
@@ -74,13 +77,8 @@
                     <?php endif?>
 
 
-           
-                   
-                  
-                
-           
-        </div>
     </div>
+    </div>   
     <? endif;?>
     <?php include_once('inc/cerca.php'); ?>
 

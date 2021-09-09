@@ -20,50 +20,88 @@
             </div>
             </div>
 
-	
-<div class="row seccion-pagina">
+
+    <div class="row seccion-pagina">
         <div class="cuadricula">
             <div class="cuadro grande-1 medio-2 chico-12">
                 <span>Vacantes</span>
             </div>
-            <div class="cuadro medio-10 grande-11 chico-12 slider-home">
-                <?php 
-						
-				        $trabajos = get_posts( array(
-				            'post_type' => 'trabajos_pt',
-				            'posts_per_page' => 3,
-				            'orderby' => 'post_date', 
-				            'order' => 'DESC',
-				        ) );
-				 			
-				            foreach ( $trabajos as $trabajo ):
-								$empresa_relacionada = get_post_meta( $trabajo->ID, 'empresa_relacionada_meta', true );
-                                 $empresa_relacionada = $empresa_relacionada[0];
-                            
-						?>
 
-                <div class="cuadro grande-4 chico-12 cuadro-trabajo" style="border-bottom: 20px solid 
-                           <?php echo get_post_meta( $empresa_relacionada, 'color_destacado_meta', true ); ?>;"> <!-- Color Estilo -->
+        <!-- <div class="cuadro medio-10 grande-11 chico-12 slider-home"> -->
+        
+            <?php 
+                    $sucursales = array(
+                            'post_type'=> 'valpa_sucursales_pt',
+                            'order'    => 'ASC',
+                            'posts_per_page' => -1,
+                            'order' => 'DESC',
+                        );              
+                 
+
+                    $sucursales_query = new WP_Query( $sucursales );
+                    if($sucursales_query->have_posts() ) : while ( $sucursales_query->have_posts() ) : $sucursales_query->the_post(); 
+                    ?>   
+
+                        <div class="cuadro medio-10 grande-11 chico-12 slider-home">
+                            <!-- <h2> 
+                                <?php  echo $post->post_title; ?> <span><?php  echo $post->post_content; ?></span>
+                            </h2> -->
+                             <?php 
+                                $id_sucursal = $post->ID;
+                                 $puestos = array(
+                                    'post_type'=> 'valpa_trabajos_pt',
+                                    'order'    => 'ASC',
+                                    'posts_per_page' => 3,
+                                    'order' => 'DESC',
+                                    'meta_query' => array(
+                                        array(
+                                            'key' => 'sucursal_relacionada_meta',
+                                            'value' => $post->ID,
+                                            'compare' => 'LIKE',
+
+                                        ),
+                                      ),
+                                );  
+    
+
+
+                                $the_query = new WP_Query( $puestos );
+                                if($the_query->have_posts() ) : while ( $the_query->have_posts() ) : $the_query->the_post(); 
+                                ?>   
+
+
+                           <div class="cuadro grande-4 chico-12 cuadro-trabajo" style="border-bottom: 20px solid 
+                           <?php echo get_post_meta( $empresa_relacionada, 'color_destacado_mb', true ); ?>;"> <!-- Color Estilo -->
                            
-                           <?php echo get_the_title( $trabajo->ID ); ?><br><br> <!-- Imprime Puesto -->
+                           <!-- <?php  echo $post->post_title; ?><br><br> Imprime Puesto -->
                            &nbsp;&nbsp;<?php echo get_the_title( $empresa_relacionada); ?><br><br> <!-- Imprime Empresa -->
                            <p class="fa fa-map-marker"> <?php echo get_post_meta( $empresa_relacionada, 'datos_destacado_meta', true ); ?> </p><br><!-- Imprime Ubicacion-->         
-                           <a href="<?php echo get_permalink($trabajo->ID); ?>">Ver mas</a>
+                           <a href="<?php echo get_permalink();?>?sucursal=<?php echo $id_sucursal;?>&puesto=<?php echo $post->ID;?>">Ver mas</a>
                            
                            <!-- echo "<a href='$link' title='$linktitle'>$linkname</a>"; -->
                                
                 </div>
-                <?php endforeach;?>
-                <div class="row">
-                    <br><br>
-                        <a href="<?php echo get_post_type_archive_link( 'trabajos_pt' ) ?> ">Ver todas las ofertas de trabajo ></a>
-                </div>  
-            </div>
-        </div>    
+
+
+                                <?php endwhile; ?>
+                            <?php else: ?>
+                                Por el momento no tenemos puestos de trabajo en esta sucursal
+
+                                <?php endif?>
+                             
+                        </div>
+                    <?php endwhile; ?>
+
+                    <?php endif?>
+
+
     </div>
+    </div>    
 
 
-	<div class="row seccion-empresa">
+
+
+	<div class="row seccion-empresa" style="background:white">
         <div class="cuadricula">
             <div class="cuadro grande-1 medio-2 chico-12">
                 <span>Empresas</span>

@@ -105,27 +105,7 @@ function cltvo_metaboxes(){
 			'valpa_ofrenda_pt',			//post type
 			'side'						//posición
 		);
-		add_meta_box(
-			'valpa_obituariorelacionado_mb',		//id
-			'Homenaje relacionado',				//título
-			'valpa_obituariorelacionado_mb',		//callback function
-			'valpa_ofrenda_pt',			//post type
-			'side'						//posición
-		);
-		add_meta_box(
-			'valpa_no_homenaje_mb',		//id
-			'Número de homenaje',				//título
-			'valpa_no_homenaje_mb',		//callback function
-			'valpa_obituario_pt',			//post type
-			'side'						//posición
-		);
-		add_meta_box(
-			'valpa_fechas_mb',		//id
-			'Fechas',				//título
-			'valpa_fechas_mb',		//callback function
-			'valpa_obituario_pt',			//post type
-			'side'						//posición
-		);
+
 	 	add_meta_box(
 			'sucursal_relacionada_mb',		//id
 			'Sucursal',				//título
@@ -133,13 +113,15 @@ function cltvo_metaboxes(){
 			array('valpa_trabajos_pt','valpa_obituario_pt'),			//post type
 			'side'						//posición
 		);
+
 		add_meta_box(
-			'servicio_relacionado_mb',		//id
-			'servicio',				//título
-			'servicio_relacionado_mb',		//callback function
-			'valpa_obituario_pt',			//post type
+			'empresa_relacionada_mb',		//id
+			'Empresa relacionada',				//título
+			'empresa_relacionada_mb',		//callback function
+			array('valpa_trabajos_pt','valpa_obituario_pt'),			//post type
 			'side'						//posición
 		);
+		
 	 	add_meta_box(
 			'documentos_necesarios_mb',		//id
 			'Documentos obligatorios',				//título
@@ -219,12 +201,75 @@ function cltvo_metaboxes(){
 			'normal'						//posición
 		);
 
+		add_meta_box(
+			'logo_destacado_mb',		//id
+			'Logotipo',				//título
+			'logo_destacado_mb',		//callback function
+			'empresas_pt',			//post type
+									//posición
+		);
+
+		add_meta_box(
+			'color_destacado_mb',		//id
+			'Color destacado',				//título
+			'color_destacado_mb',		//callback function
+			'empresas_pt',			//post type
+			'side'						//posición
+		);
+
 	}
 		
 	// agrega aqui ...
 }
 
 // ---------------------- funcion del meta box ---------------------- 
+
+function empresa_relacionada_mb($object) {
+	
+	$args = array( 
+		'post_status' => get_post_stati(),
+		'posts_per_page' => -1,
+		'post_type'        => 'empresas_pt',
+		'order_by' => 'post_title',
+		'order'=>'ASC'
+	);
+
+
+	$empresas = get_posts( $args );
+
+	 wp_nonce_field( basename(__FILE__), 'mam_nonce' );
+
+    // How to use 'get_post_meta()' for multiple checkboxes as array?
+    $postmeta = maybe_unserialize( get_post_meta( $object->ID, 'empresa_relacionada_meta', true ) );
+
+    // Our associative array here. id = value
+    $empresa_relacionada_meta = array();
+
+	foreach ( $empresas as $empresa ) :
+		$empresa_relacionada_meta[$empresa->ID] = $empresa->post_title ;
+	endforeach; 
+    // Loop through array and make a checkbox for each element
+    foreach ( $empresa_relacionada_meta as $id => $element) {
+
+        // If the postmeta for checkboxes exist and 
+        // this element is part of saved meta check it.
+        if ( is_array( $postmeta ) && in_array( $id, $postmeta ) ) {
+            $checked = 'checked="checked"';
+        } else {
+            $checked = null;
+        }
+        ?>
+
+        <p>
+            <input  type="checkbox" name="empresa_relacionada_in[]" value="<?php echo $id;?>" <?php echo $checked; ?> />
+            <?php echo $element;?>
+        </p>
+
+        <?php
+    }
+	
+
+}
 
 function valpa_create_info($prefix,$con,$desc,$link) {
 
@@ -518,6 +563,22 @@ function valpa_telefono_solicitante_mb($object) {
    
 
 }
+
+function logo_destacado_mb($object){
+	echo '<p><label>poner logo SVG:</label></p>';
+	echo '<textarea name="logo_destacado_in" placeholder="svg xmlns version=1.0 ..."
+		   style="width:100% !important; height:150px !important;" >';
+	echo get_post_meta($object->ID, 'logo_destacado_meta', true);
+	echo '</textarea>'; 
+}
+
+function color_destacado_mb($object){
+	echo '<p><label>poner color hexadecimal:</label></p>';
+	echo '<input name="color_destacado_in" placeholder="#fffff" type="text" value="';
+	echo get_post_meta($object->ID, 'color_destacado_meta', true);
+	echo '" />';
+}
+
 function valpa_telefono_prospecto_mb($object) {
 		$day = get_post_meta($object->ID, '_start_day', true); 
         $month = get_post_meta($object->ID, '_start_month', true); 
@@ -888,7 +949,15 @@ function cltvo_save_post($id){
 	}
 
 	// ---------------------- funciones interiores del save ---------------------- 
-
+	if( isset( $_POST[ 'empresa_relacionada_in' ] ) ) {
+	    update_post_meta( $id, 'empresa_relacionada_meta', $_POST[ 'empresa_relacionada_in' ] );
+	}
+	if( isset( $_POST[ 'logo_destacado_in' ] ) ) {
+	    update_post_meta( $id, 'logo_destacado_meta', $_POST[ 'logo_destacado_in' ] );
+	}
+	if( isset( $_POST[ 'color_destacado_in' ] ) ) {
+	    update_post_meta( $id, 'color_destacado_meta', $_POST[ 'color_destacado_in' ] );
+	}
 	if(isset($_POST['fecha_dia_in'])){
 		$fecha = $_POST['fecha_dia_in'].'-'.$_POST['fecha_mes_in'].'-'.$_POST['fecha_ano_in'];
 		update_post_meta($id, 'fecha_meta', $fecha);
